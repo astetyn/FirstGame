@@ -1,6 +1,7 @@
 package com.firstgame.game;
 
 import com.firstgame.game.math.Location;
+import com.firstgame.game.math.RGBColor;
 import com.firstgame.game.math.TilePosition;
 
 import java.io.Serializable;
@@ -23,12 +24,12 @@ public class World implements Serializable {
                 int x = j*tileSize;
                 int y = i*tileSize;
                 if(x<=150&&y<=150) {
-                    tileMap[i][j] = new Tile(false, new Location(x, y), new TilePosition(j, i));
+                    tileMap[i][j] = new Tile(false, new Location(x, y), new TilePosition(j, i), new RGBColor(255,255,255));
                 }else{
                     if(Math.random()<=0.06){
-                        tileMap[i][j] = new Tile(true, new Location(x, y), new TilePosition(j, i));
+                        tileMap[i][j] = new Tile(true, new Location(x, y), new TilePosition(j, i), new RGBColor(255,255,255));
                     }else{
-                        tileMap[i][j] = new Tile(false, new Location(x, y), new TilePosition(j, i));
+                        tileMap[i][j] = new Tile(false, new Location(x, y), new TilePosition(j, i), new RGBColor(255,255,255));
                     }
                 }
             }

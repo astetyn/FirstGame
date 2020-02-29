@@ -10,11 +10,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.firstgame.game.Game;
 import com.firstgame.R;
+import com.firstgame.game.GameManager;
+import com.firstgame.game.client.ClientGameManager;
+import com.firstgame.game.server.ServerGameManager;
 
 public class MainActivity extends AppCompatActivity {
 
-    private boolean server;
-    private Game game;
+    private GameManager gameManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,28 +26,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onDestroy(){
-        super.onDestroy();
+    public void onStop(){
+        super.onStop();
+        if(gameManager!=null) {
+            gameManager.onStop();
+        }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if(game==null) {
-            super.onRequestPermissionsResult(requestCode,permissions,grantResults);
-            return;
+    public void onDestroy(){
+        super.onDestroy();
+        if(gameManager!=null) {
+            gameManager.onDestroy();
         }
-        game.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     public void chooseServerListener(View v){
-        server = true;
         setContentView(R.layout.server_launcher);
     }
 
     public void chooseClientListener(View v){
-        server = false;
         setContentView(R.layout.wait_room);
-        new ClientManager(this);
+        gameManager = new ClientGameManager(this);
     }
 
     public void launchServerListener(View view){
@@ -56,20 +58,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.wait_room);
 
         if(rb2P.isChecked()){
-            new ServerManager(2,this);
+            gameManager = new ServerGameManager(2,this);
         }else if(rb3P.isChecked()){
-            new ServerManager(3,this);
+            gameManager = new ServerGameManager(3,this);
         }else if(rb4P.isChecked()){
-            new ServerManager(4,this);
+            gameManager = new ServerGameManager(4,this);
         }
     }
 
     public TextView getWaitRoomLog(){
         return findViewById(R.id.statusLog);
-    }
-
-    public boolean isServer() {
-        return server;
     }
 
 }

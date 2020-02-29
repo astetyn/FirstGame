@@ -1,6 +1,6 @@
-package com.firstgame.server.packets;
+package com.firstgame.packets;
 
-import com.firstgame.server.PlayerLite;
+import com.firstgame.game.server.PlayerLite;
 
 import java.io.Serializable;
 

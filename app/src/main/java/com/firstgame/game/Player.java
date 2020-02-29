@@ -2,6 +2,7 @@ package com.firstgame.game;
 
 import com.firstgame.game.math.Location;
 import com.firstgame.game.math.RGBColor;
+import com.firstgame.game.server.PlayerLite;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,10 +10,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-public class Player extends PlayerLite {
+public class Player extends Entity {
 
-    public Player(Location location, int sizeX, int sizeY, RGBColor color, int uniqueID) {
-        super(location, sizeX, sizeY, color, uniqueID);
+    private static final int PLAYER_WIDTH = 50;
+    private static final int PLAYER_HEIGTH = 50;
+
+    public Player(Location location, RGBColor color, int UID) {
+        super(location, PLAYER_WIDTH, PLAYER_HEIGTH, color, UID);
     }
 
     public Player deepClone() {

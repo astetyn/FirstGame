@@ -1,15 +1,16 @@
-package com.firstgame.server;
+package com.firstgame.game.client;
 
-import com.firstgame.menu.ClientManager;
-import com.firstgame.server.packets.EndPacket;
-import com.firstgame.server.packets.GamePacketFromClient;
-import com.firstgame.server.packets.GamePacketFromServer;
-import com.firstgame.server.packets.HandshakePacketFromClient;
-import com.firstgame.server.packets.HandshakePacketFromServer;
-import com.firstgame.server.packets.UpdateWaitingPacketFromServer;
+import com.firstgame.game.Connectable;
+import com.firstgame.game.server.UDPReceiver;
+import com.firstgame.packets.EndPacket;
+import com.firstgame.packets.GamePacketFromClient;
+import com.firstgame.packets.GamePacketFromServer;
+import com.firstgame.packets.GameStartData;
+import com.firstgame.packets.HandshakePacketFromClient;
+import com.firstgame.packets.HandshakePacketFromServer;
+import com.firstgame.packets.UpdateWaitingPacketFromServer;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -20,14 +21,13 @@ import java.util.Enumeration;
 
 public class ClientGateway implements Connectable, Runnable {
 
-    private ClientManager clientManager;
+    private ClientGameManager clientManager;
     private InetAddress serverAddress;
     private UDPReceiver udpReceiver;
-    private int clientID;
     private boolean connected;
     private GamePacketFromClient gamePacketFromClient;
 
-    public ClientGateway(ClientManager clientManager){
+    public ClientGateway(ClientGameManager clientManager){
         connected = false;
         this.clientManager = clientManager;
         udpReceiver = new UDPReceiver(this, DEFAULT_PORT);
@@ -53,28 +53,35 @@ public class ClientGateway implements Connectable, Runnable {
     public void onObjectReceive(Object o, DatagramPacket receivedPacket) {
 
         if(o instanceof HandshakePacketFromServer) {
-
+            System.out.println("//Received HS packet");
+            if(connected){
+                return;
+            }
             HandshakePacketFromServer hp = (HandshakePacketFromServer) o;
             System.out.println("Successful handshake on adress: " + receivedPacket.getAddress());
             serverAddress = receivedPacket.getAddress();
-            clientID = hp.getClientID();
-            clientManager.onServerConnection(hp.getWorld(), hp.getPlayersConnected(), hp.getPlayersToStart());
+            clientManager.onServerConnection(hp.getPlayersConnected(), hp.getPlayersToStart());
             connected = true;
 
         }else if(o instanceof UpdateWaitingPacketFromServer){
-
+            System.out.println("//Received UW packet");
             UpdateWaitingPacketFromServer uwp = (UpdateWaitingPacketFromServer) o;
             clientManager.updatePlayersConnected(uwp.getPlayersConnected());
 
-        }else if(o instanceof GamePacketFromServer){
+        }else if(o instanceof GameStartData){
+            System.out.println("//Received GSD packet");
+            GameStartData gsd = (GameStartData) o;
+            clientManager.onGameStart(gsd);
 
+        }else if(o instanceof GamePacketFromServer){
+            System.out.println("//Received GPS packet");
             clientManager.onGamePacketReceived((GamePacketFromServer) o);
 
             GamePacketFromClient gpc;
             synchronized (gamePacketFromClient) {
                 gpc = new GamePacketFromClient(gamePacketFromClient);
             }
-            sendObject(gpc);
+            sendObject(serverAddress,gpc);
 
         }else if(o instanceof EndPacket){
             terminate();
@@ -129,32 +136,9 @@ public class ClientGateway implements Connectable, Runnable {
         sendSocket.close();
     }
 
-    public void sendObject(Object o) {
-        try {
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-
-            oos.writeObject(o);
-            byte[] data = baos.toByteArray();
-
-            DatagramPacket packet = new DatagramPacket(data, data.length, serverAddress, DEFAULT_PORT);
-            DatagramSocket socket = new DatagramSocket();
-            socket.send(packet);
-            socket.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void terminate(){
         if(udpReceiver!=null) {
             udpReceiver.terminate();
         }
-    }
-
-    public int getClientID(){
-        return clientID;
     }
 }

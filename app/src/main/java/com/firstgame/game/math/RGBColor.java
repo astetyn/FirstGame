@@ -4,23 +4,23 @@ import java.io.Serializable;
 
 public class RGBColor implements Serializable {
 
-    private short r,g,b;
+    private int r,g,b;
 
-    public RGBColor(short r, short g, short b){
+    public RGBColor(int r, int g, int b){
         this.r = r;
         this.g = g;
         this.b = b;
     }
 
-    public short getR() {
+    public int getR() {
         return r;
     }
 
-    public short getG() {
+    public int getG() {
         return g;
     }
 
-    public short getB() {
+    public int getB() {
         return b;
     }
 }

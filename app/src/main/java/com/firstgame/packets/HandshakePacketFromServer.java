@@ -1,29 +1,18 @@
-package com.firstgame.server.packets;
+package com.firstgame.packets;
 
 import com.firstgame.game.World;
+import com.firstgame.game.math.RGBColor;
 
 import java.io.Serializable;
 
 public class HandshakePacketFromServer implements Serializable {
 
-    private int clientID;
-    private World world;
     private int playersConnected;
     private int playersToStart;
 
-    public HandshakePacketFromServer(int clientID, World world, int playersConnected, int playersToStart){
-        this.clientID = clientID;
-        this.world = world;
+    public HandshakePacketFromServer(int playersConnected, int playersToStart){
         this.playersConnected = playersConnected;
         this.playersToStart = playersToStart;
-    }
-
-    public int getClientID() {
-        return clientID;
-    }
-
-    public World getWorld() {
-        return world;
     }
 
     public int getPlayersConnected() {

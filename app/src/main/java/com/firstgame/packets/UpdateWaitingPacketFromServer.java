@@ -1,4 +1,4 @@
-package com.firstgame.server.packets;
+package com.firstgame.packets;
 
 import java.io.Serializable;
 

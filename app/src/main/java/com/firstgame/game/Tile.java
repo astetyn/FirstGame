@@ -1,6 +1,7 @@
 package com.firstgame.game;
 
 import com.firstgame.game.math.Location;
+import com.firstgame.game.math.RGBColor;
 import com.firstgame.game.math.TilePosition;
 
 import java.io.Serializable;
@@ -10,17 +11,13 @@ public class Tile implements Serializable {
     private boolean solid;
     private Location location;
     private TilePosition position;
-    private ColorCode coloredCode;
+    private RGBColor color;
 
-    public Tile(boolean solid, Location location, TilePosition position){
+    public Tile(boolean solid, Location location, TilePosition position, RGBColor color){
         this.solid = solid;
         this.location = location;
         this.position = position;
-        if(solid){
-            coloredCode = ColorCode.SOLID;
-        }else{
-            coloredCode = ColorCode.DEFAULT;
-        }
+        this.color = color;
     }
 
     public boolean isSolid() {
@@ -35,11 +32,11 @@ public class Tile implements Serializable {
         return position;
     }
 
-    public ColorCode getColoredCode() {
-        return coloredCode;
+    public RGBColor getColor() {
+        return color;
     }
 
-    public void setColoredCode(ColorCode coloredCode) {
-        this.coloredCode = coloredCode;
+    public void setColor(RGBColor color) {
+        this.color = color;
     }
 }
