@@ -1,20 +1,20 @@
 package com.firstgame.menu;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
 
-import com.firstgame.game.Game;
 import com.firstgame.R;
 import com.firstgame.game.GameManager;
 import com.firstgame.game.client.ClientGameManager;
 import com.firstgame.game.server.ServerGameManager;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends FragmentActivity {
 
     private GameManager gameManager;
 

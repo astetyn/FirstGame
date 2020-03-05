@@ -1,34 +1,19 @@
 package com.firstgame.game;
 
-import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-
-import com.firstgame.game.math.Location;
 import com.firstgame.game.math.RGBColor;
-import com.firstgame.menu.MainActivity;
-
-import java.util.LinkedHashSet;
-import java.util.List;
 
 import processing.core.PApplet;
 
-public class Game extends PApplet {
+public class GameRenderer extends PApplet {
 
     private World world;
-    private Player player;
-
-    private long lastTimeStamp = System.currentTimeMillis();
-    private LinkedHashSet<Tile> updatedTiles = new LinkedHashSet<>();
-    private double secondsToEnd;
     private GameManager gameManager;
+    private long lastTimeStamp;
 
-    public Game(GameManager manager, World world, Player player){
-        this.gameManager = manager;
+    public GameRenderer(GameManager manager, World world){
         this.world = world;
-        this.player = player;
+        this.gameManager = manager;
+        lastTimeStamp = System.currentTimeMillis();
     }
 
     public void settings(){
@@ -73,10 +58,6 @@ public class Game extends PApplet {
             fill(c.getR(),c.getG(),c.getB());
             rect(p.getLocation().getX(),p.getLocation().getY(),p.getSizeX(),p.getSizeY());
         }
-    }
-
-    public LinkedHashSet<Tile> getUpdatedTiles() {
-        return updatedTiles;
     }
 
 }

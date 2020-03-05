@@ -16,7 +16,6 @@ public class ServerGateway implements Connectable, Runnable {
 
     private UDPReceiver udpReceiver;
     private ServerGameManager serverManager;
-    private GamePacketFromServer gps;
     boolean readyToStart;
 
     public ServerGateway(ServerGameManager serverManager){
@@ -46,29 +45,13 @@ public class ServerGateway implements Connectable, Runnable {
                     continue;
                 }
 
-                GamePacketFromServer gps2;
-                synchronized (gps) {
-                    gps2 = new GamePacketFromServer(gps);
+                for(ConnectedPlayer cc : serverManager.getConnectedPlayers()) {
+                    sendObject(cc.getAddress(), serverManager.createServerPacket());
                 }
-
-                for(ConnectedPlayer cc : serverManager.getConnectedPlayers()){
-                    sendObject(cc.getAddress(), gps2);
-                }
-
                 Thread.sleep(50);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
-    }
-
-    public void setGamePacketToBeSent(GamePacketFromServer gps2){
-        if(gps!=null) {
-            synchronized (gps) {
-                gps = gps2;
-            }
-        }else{
-            gps = gps2;
         }
     }
 

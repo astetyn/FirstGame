@@ -4,12 +4,11 @@ import android.widget.FrameLayout;
 
 import com.firstgame.R;
 import com.firstgame.game.EnginePhysics;
-import com.firstgame.game.Game;
+import com.firstgame.game.GameRenderer;
 import com.firstgame.game.GameManager;
 import com.firstgame.game.Player;
+import com.firstgame.game.Tile;
 import com.firstgame.game.World;
-import com.firstgame.game.math.Location;
-import com.firstgame.game.math.RGBColor;
 import com.firstgame.menu.MainActivity;
 import com.firstgame.game.server.PlayerLite;
 import com.firstgame.packets.GamePacketFromClient;
@@ -24,16 +23,18 @@ import processing.android.PFragment;
 public class ClientGameManager extends GameManager {
 
     private ClientGateway clientGateway;
-    private Game game;
+    private GameRenderer gameRenderer;
     private World world;
     private int playersToStart;
     private Player player;
     private List<Player> enemies;
     private EnginePhysics enginePhysics;
+    private boolean startDataCame;
 
     public ClientGameManager(MainActivity activity){
         super(activity);
         activity.getWaitRoomLog().setText("Connecting to server.");
+        startDataCame = false;
 
         clientGateway = new ClientGateway(this);
         Thread t = new Thread(clientGateway);
@@ -55,16 +56,24 @@ public class ClientGameManager extends GameManager {
 
     @Override
     public void onStop() {
-        if(game!=null){
-            game.onStop();
+        if(gameRenderer !=null){
+            gameRenderer.onStop();
         }
     }
 
     @Override
     public void onDestroy() {
-        if(game!=null){
-            game.onDestroy();
+        if(gameRenderer !=null){
+            gameRenderer.onDestroy();
         }
+    }
+
+    public GamePacketFromClient createClientPacket(){
+        PlayerLite playerLite;
+        synchronized (player) {
+            playerLite = new PlayerLite(player);
+        }
+        return new GamePacketFromClient(playerLite, player.getUniqueID());
     }
 
     public void onServerConnection(int playersConnected, int playersToStart){
@@ -76,17 +85,12 @@ public class ClientGameManager extends GameManager {
 
     public void onGameStart(GameStartData gameStartData){
 
-        player = gameStartData.getPlayers().get(gameStartData.getUID());
+        player = gameStartData.getPlayer();
         world = gameStartData.getWorld();
-
-        enemies = gameStartData.getPlayers();
-        enemies.remove(player);
-
-        System.out.println("11111"+player);
+        enemies = gameStartData.getEnemies();
 
         enginePhysics = new EnginePhysics(world, player, enemies);
-
-        game = new Game(this, world, player);
+        gameRenderer = new GameRenderer(this, world);
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -94,21 +98,46 @@ public class ClientGameManager extends GameManager {
                 getActivity().setContentView(R.layout.game);
 
                 FrameLayout frame = getActivity().findViewById(R.id.gameFrame);
-                PFragment fragment = new PFragment(game);
+                PFragment fragment = new PFragment(gameRenderer);
                 fragment.setView(frame, getActivity());
             }
         });
+        startDataCame = true;
     }
 
-    public void onGamePacketReceived(GamePacketFromServer gamePacketFromServer){ //unsynchronized
+    public void onGamePacketReceived(GamePacketFromServer gamePacketFromServer){
 
-        //process packet every time when packet comes
+        if(!startDataCame){
+            return;
+        }
 
-        GamePacketFromClient gpc = new GamePacketFromClient(new PlayerLite(player),player.getUniqueID());
-        clientGateway.setGamePacketToBeSent(gpc);
+        int i = 0;
+        boolean b = false;
+
+        for (PlayerLite pl : gamePacketFromServer.getPlayers()) {
+
+            if(player.getUniqueID()==i){
+                i++;
+                b = true;
+                continue;
+            }
+            Player enemy;
+
+            if(b){
+                enemy = enemies.get(i-1);
+            }else{
+                enemy = enemies.get(i);
+            }
+            enemy.setLocation(pl.getLocation());
+            enemy.setVelocity(pl.getVelocity());
+            i++;
+        }
+        for(Tile t : gamePacketFromServer.getActiveTiles()){
+            world.getTileMap()[t.getPosition().getX()][t.getPosition().getY()] = t;
+        }
     }
 
     public void updatePlayersConnected(int playersConnected){
-        getActivity().runOnUiThread(() -> getActivity().getWaitRoomLog().setText("Connected. Waiting for players: "+playersConnected+1+"/"+playersToStart));
+        getActivity().runOnUiThread(() -> getActivity().getWaitRoomLog().setText("Connected. Waiting for players: "+(playersConnected+1)+"/"+playersToStart));
     }
 }

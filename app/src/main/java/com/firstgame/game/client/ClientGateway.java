@@ -25,7 +25,6 @@ public class ClientGateway implements Connectable, Runnable {
     private InetAddress serverAddress;
     private UDPReceiver udpReceiver;
     private boolean connected;
-    private GamePacketFromClient gamePacketFromClient;
 
     public ClientGateway(ClientGameManager clientManager){
         connected = false;
@@ -53,7 +52,6 @@ public class ClientGateway implements Connectable, Runnable {
     public void onObjectReceive(Object o, DatagramPacket receivedPacket) {
 
         if(o instanceof HandshakePacketFromServer) {
-            System.out.println("//Received HS packet");
             if(connected){
                 return;
             }
@@ -64,35 +62,21 @@ public class ClientGateway implements Connectable, Runnable {
             connected = true;
 
         }else if(o instanceof UpdateWaitingPacketFromServer){
-            System.out.println("//Received UW packet");
             UpdateWaitingPacketFromServer uwp = (UpdateWaitingPacketFromServer) o;
             clientManager.updatePlayersConnected(uwp.getPlayersConnected());
 
         }else if(o instanceof GameStartData){
-            System.out.println("//Received GSD packet");
             GameStartData gsd = (GameStartData) o;
             clientManager.onGameStart(gsd);
 
         }else if(o instanceof GamePacketFromServer){
-            System.out.println("//Received GPS packet");
             clientManager.onGamePacketReceived((GamePacketFromServer) o);
-
-            GamePacketFromClient gpc;
-            synchronized (gamePacketFromClient) {
-                gpc = new GamePacketFromClient(gamePacketFromClient);
-            }
-            sendObject(serverAddress,gpc);
+            sendObject(serverAddress,clientManager.createClientPacket());
 
         }else if(o instanceof EndPacket){
             terminate();
         }
 
-    }
-
-    public void setGamePacketToBeSent(GamePacketFromClient gpc){
-        synchronized (gamePacketFromClient) {
-            gamePacketFromClient = gpc;
-        }
     }
 
     private void makeHandshakeWithServer() throws Exception {

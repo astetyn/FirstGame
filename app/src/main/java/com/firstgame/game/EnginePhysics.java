@@ -56,7 +56,6 @@ public class EnginePhysics {
 			collidedTilesFromEntities.addAll(getCollidedTiles(p));
 		}
 
-		//Return these tiles
 		return collidedTilesFromEntities;
 	}
 

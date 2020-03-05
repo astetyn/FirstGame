@@ -8,25 +8,26 @@ import java.util.List;
 
 public class GameStartData implements Serializable {
 
-    private int UID;
-    private List<Player> players;
+    private Player player;
+    private List<Player> enemies;
     private World world;
 
-    public GameStartData(int UID, List<Player> players, World world) {
-        this.UID = UID;
-        this.players = players;
+    public GameStartData(Player player, List<Player> enemies, World world) {
+        this.player = player;
+        this.enemies = enemies;
         this.world = world;
     }
 
-    public int getUID() {
-        return UID;
+    public Player getPlayer() {
+        return player;
     }
 
-    public List<Player> getPlayers() {
-        return players;
+    public List<Player> getEnemies() {
+        return enemies;
     }
 
     public World getWorld() {
         return world;
     }
+
 }

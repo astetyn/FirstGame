@@ -14,11 +14,6 @@ public class GamePacketFromClient implements Serializable {
         this.clientID = clientID;
     }
 
-    public GamePacketFromClient(GamePacketFromClient gpc){
-        this.player = new PlayerLite(gpc.getPlayer());
-        this.clientID = gpc.getClientID();
-    }
-
     public PlayerLite getPlayer(){
         return player;
     }

@@ -5,22 +5,17 @@ import com.firstgame.game.server.PlayerLite;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 public class GamePacketFromServer implements Serializable {
 
     private List<PlayerLite> players;
-    private Tile[][] map;
+    private Set<Tile> activeTiles;
     private double secondsToEnd;
 
-    public GamePacketFromServer(GamePacketFromServer gps){
-        this.players = gps.getPlayers();
-        this.map = gps.getMap();
-        this.secondsToEnd = gps.getSecondsToEnd();
-    }
-
-    public GamePacketFromServer(List<PlayerLite> players, Tile[][] map, double secondsToEnd){
+    public GamePacketFromServer(List<PlayerLite> players, Set<Tile> activeTiles, double secondsToEnd){
         this.players = players;
-        this.map = map;
+        this.activeTiles = activeTiles;
         this.secondsToEnd  = secondsToEnd;
     }
 
@@ -28,8 +23,8 @@ public class GamePacketFromServer implements Serializable {
         return players;
     }
 
-    public Tile[][] getMap(){
-        return this.map;
+    public Set<Tile> getActiveTiles(){
+        return this.activeTiles;
     }
 
     public double getSecondsToEnd() {

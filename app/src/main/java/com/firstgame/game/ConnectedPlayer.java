@@ -2,7 +2,6 @@ package com.firstgame.game;
 
 import com.firstgame.game.math.Location;
 import com.firstgame.game.math.RGBColor;
-import com.firstgame.game.server.PlayerLite;
 
 import java.io.Serializable;
 import java.net.InetAddress;
